@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const user = createUser(name, email, password);
+    const user = createUser(name, email);
     const response = NextResponse.json({ status: "registered", user: toPublicUser(user) });
 
     response.cookies.set(userSessionCookie, user.sessionToken, {
