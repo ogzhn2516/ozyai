@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 const adminCookie = "wiro_admin_session";
 const userCookie = "wiro_user_session";
+const protectedUserPaths = ["/panel", "/create", "/image-generator", "/voice-generator"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/panel")) {
+  if (protectedUserPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
     const session = request.cookies.get(userCookie)?.value;
 
     if (session) {
@@ -15,6 +16,7 @@ export function middleware(request: NextRequest) {
 
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("next", pathname);
 
     return NextResponse.redirect(loginUrl);
   }
@@ -38,5 +40,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/panel/:path*"],
+  matcher: ["/admin/:path*", "/panel/:path*", "/create/:path*", "/image-generator/:path*", "/voice-generator/:path*"],
 };

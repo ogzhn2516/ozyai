@@ -2,11 +2,14 @@
 
 import { ArrowRight, Loader2, LogIn } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useState } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const next = nextParam?.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/panel";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +32,7 @@ export default function LoginPage() {
         throw new Error(data.error ?? "Giriş yapılamadı.");
       }
 
-      router.replace("/panel");
+      router.replace(next);
       router.refresh();
     } catch (apiError) {
       setError(apiError instanceof Error ? apiError.message : "Beklenmeyen bir hata oluştu.");
@@ -91,5 +94,13 @@ export default function LoginPage() {
         </p>
       </form>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="px-4 py-10 text-sm text-slate-600">Giriş ekranı hazırlanıyor...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

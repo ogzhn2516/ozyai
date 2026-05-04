@@ -9,12 +9,11 @@ export const metadata: Metadata = {
 
 const navItems = [
   { href: "/", label: "Ana Sayfa" },
-  { href: "/panel", label: "Panel" },
   { href: "/create", label: "Video Oluştur" },
   { href: "/image-generator", label: "Görsel Üret" },
   { href: "/voice-generator", label: "Seslendir" },
-  { href: "/register", label: "Kayıt" },
-  { href: "/admin", label: "Admin" },
+  { href: "/login", label: "Giriş" },
+  { href: "/register", label: "Kayıt Ol" },
 ];
 
 export default function RootLayout({
