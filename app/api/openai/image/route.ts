@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getEnvValue } from "../../../lib/env-store";
+import { getEnvValue, getRequestEnvValue } from "../../../lib/env-store";
 
 type OpenAIImageResponse = {
   data?: Array<{
@@ -10,9 +10,7 @@ type OpenAIImageResponse = {
   usage?: unknown;
 };
 
-function mockImage(mode: string) {
-  const model = getEnvValue("OPENAI_IMAGE_MODEL", "gpt-image-1.5");
-
+function mockImage(mode: string, model: string) {
   return NextResponse.json({
     status: "mock",
     mode,
@@ -51,8 +49,8 @@ async function parseOpenAIResponse(response: Response, outputFormat: string, mod
 }
 
 export async function POST(request: Request) {
-  const model = getEnvValue("OPENAI_IMAGE_MODEL", "gpt-image-1.5");
-  const apiKey = getEnvValue("OPENAI_API_KEY");
+  const model = getRequestEnvValue(request, "OPENAI_IMAGE_MODEL", getEnvValue("OPENAI_IMAGE_MODEL", "gpt-image-1.5"));
+  const apiKey = getRequestEnvValue(request, "OPENAI_API_KEY");
   const formData = await request.formData();
   const mode = readText(formData.get("mode"), "text-to-image");
   const prompt = readText(formData.get("prompt")).trim();
@@ -77,7 +75,7 @@ export async function POST(request: Request) {
 
   if (!apiKey) {
     await new Promise((resolve) => setTimeout(resolve, 700));
-    return mockImage(mode);
+    return mockImage(mode, model);
   }
 
   try {

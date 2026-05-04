@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import {
+  decodeRuntimeSettings,
+  encodeRuntimeSettings,
   managedEnvKeys,
   maskSecret,
   readEnvFile,
+  runtimeSettingsCookie,
   writeManagedEnv,
   type ManagedEnvKey,
+  type ManagedEnvValues,
 } from "../../../lib/env-store";
 import { isAdminSessionValid } from "../../../lib/admin-auth";
 
@@ -17,12 +21,12 @@ const secretKeys = new Set<ManagedEnvKey>([
   "ELEVENLABS_API_KEY",
 ]);
 
-function getSettings() {
+function getSettings(runtimeSettings: ManagedEnvValues = {}) {
   const env = readEnvFile();
 
   return managedEnvKeys.reduce(
     (settings, key) => {
-      const value = env.get(key) || process.env[key] || "";
+      const value = runtimeSettings[key] || env.get(key) || process.env[key] || "";
 
       settings[key] = {
         configured: Boolean(value),
@@ -47,10 +51,12 @@ export async function GET() {
   if (!(await isAdminSessionValid())) {
     return NextResponse.json({ error: "Admin oturumu gerekli." }, { status: 401 });
   }
+  const cookieStore = await import("next/headers").then(({ cookies }) => cookies());
+  const runtimeSettings = decodeRuntimeSettings(cookieStore.get(runtimeSettingsCookie)?.value);
 
   return NextResponse.json({
     status: "completed",
-    settings: getSettings(),
+    settings: getSettings(runtimeSettings),
   });
 }
 
@@ -69,9 +75,23 @@ export async function POST(request: Request) {
   }
 
   writeManagedEnv(updates);
-
-  return NextResponse.json({
+  const cookieStore = await import("next/headers").then(({ cookies }) => cookies());
+  const runtimeSettings = {
+    ...decodeRuntimeSettings(cookieStore.get(runtimeSettingsCookie)?.value),
+    ...updates,
+  };
+  const response = NextResponse.json({
     status: "saved",
-    settings: getSettings(),
+    settings: getSettings(runtimeSettings),
   });
+
+  response.cookies.set(runtimeSettingsCookie, encodeRuntimeSettings(runtimeSettings), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+
+  return response;
 }

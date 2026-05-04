@@ -230,7 +230,7 @@ export default function AdminPage() {
         WIRO_API_SECRET: "",
         ELEVENLABS_API_KEY: "",
       }));
-      setMessage(".env.local güncellendi. API rotaları yeni değerleri dinamik okuyacak.");
+      setMessage("Ayarlar kaydedildi. Vercel'de bu tarayıcı oturumundan yapılan API istekleri yeni değerleri kullanacak.");
     } catch (apiError) {
       setError(apiError instanceof Error ? apiError.message : "Beklenmeyen bir hata oluştu.");
     } finally {
