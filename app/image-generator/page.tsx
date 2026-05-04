@@ -26,6 +26,20 @@ const sizes = ["1024x1024", "1024x1536", "1536x1024"] as const;
 const qualities = ["low", "medium", "high"] as const;
 const formats = ["png", "webp", "jpeg"] as const;
 
+async function readApiJson<T>(response: Response) {
+  const text = await response.text();
+
+  if (!text) {
+    throw new Error("API boş yanıt döndürdü.");
+  }
+
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(text.slice(0, 500));
+  }
+}
+
 export default function ImageGeneratorPage() {
   const [mode, setMode] = useState<GenerateMode>("text-to-image");
   const [prompt, setPrompt] = useState("");
@@ -88,7 +102,7 @@ export default function ImageGeneratorPage() {
         body: formData,
       });
 
-      const data = (await response.json()) as ImageResult & { error?: string };
+      const data = await readApiJson<ImageResult & { error?: string }>(response);
 
       if (!response.ok) {
         throw new Error(data.error ?? "Görsel üretim isteği başarısız oldu.");

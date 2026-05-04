@@ -21,6 +21,7 @@ type ManagedKey =
   | "WIRO_API_KEY"
   | "WIRO_API_SECRET"
   | "WIRO_API_BASE_URL"
+  | "WIRO_IMAGE_ENDPOINT"
   | "WIRO_AVATAR_VIDEO_ENDPOINT"
   | "ELEVENLABS_API_KEY"
   | "ELEVENLABS_TTS_MODEL";
@@ -58,8 +59,8 @@ const services: Array<{
     fields: [
       {
         key: "OPENAI_API_KEY",
-        label: "OpenAI API key",
-        placeholder: "sk-...",
+        label: "OpenAI API key (opsiyonel)",
+        placeholder: "Sadece OpenAI key kullanacaksanız sk-...",
         secret: true,
       },
       {
@@ -91,6 +92,11 @@ const services: Array<{
         key: "WIRO_API_BASE_URL",
         label: "Wiro base URL",
         placeholder: "https://api.wiro.ai/v1",
+      },
+      {
+        key: "WIRO_IMAGE_ENDPOINT",
+        label: "Wiro image endpoint",
+        placeholder: "/Run/wiro/text-to-image-sana",
       },
       {
         key: "WIRO_AVATAR_VIDEO_ENDPOINT",
@@ -126,6 +132,7 @@ const defaultValues: Record<ManagedKey, string> = {
   WIRO_API_KEY: "",
   WIRO_API_SECRET: "",
   WIRO_API_BASE_URL: "",
+  WIRO_IMAGE_ENDPOINT: "/Run/wiro/text-to-image-sana",
   WIRO_AVATAR_VIDEO_ENDPOINT: "/Run/wiro/avatarmotion",
   ELEVENLABS_API_KEY: "",
   ELEVENLABS_TTS_MODEL: "eleven_multilingual_v2",
