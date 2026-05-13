@@ -1,45 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
+import { sessionCookieName, verifySessionValue } from "./app/lib/auth";
 
-const adminCookie = "wiro_admin_session";
-const userCookie = "wiro_user_session";
-const protectedUserPaths = ["/panel", "/create", "/image-generator", "/voice-generator"];
-const fallbackAdminSessionSecret = "ozyai-admin-session-fallback-2026";
-
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isProtectedPage = pathname === "/panel" || pathname.startsWith("/panel/");
+  const isProtectedInfluencerList = pathname === "/influencers" || pathname.startsWith("/influencers/");
+  const isProtectedApi = pathname.startsWith("/api/influencers");
+  const isProtectedInstagramApi = pathname.startsWith("/api/instagram");
 
-  if (protectedUserPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
-    const session = request.cookies.get(userCookie)?.value;
-
-    if (session) {
-      return NextResponse.next();
-    }
-
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.searchParams.set("next", pathname);
-
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (!pathname.startsWith("/admin") || pathname === "/admin/login") {
+  if (!isProtectedPage && !isProtectedInfluencerList && !isProtectedApi && !isProtectedInstagramApi) {
     return NextResponse.next();
   }
 
-  const expectedSession = process.env.ADMIN_SESSION_SECRET || fallbackAdminSessionSecret;
-  const session = request.cookies.get(adminCookie)?.value;
+  const session = request.cookies.get(sessionCookieName)?.value;
 
-  if (expectedSession && session === expectedSession) {
+  if (await verifySessionValue(session)) {
     return NextResponse.next();
+  }
+
+  if (isProtectedApi || isProtectedInstagramApi) {
+    return NextResponse.json({ error: "Oturum gerekli." }, { status: 401 });
   }
 
   const loginUrl = request.nextUrl.clone();
-  loginUrl.pathname = "/admin/login";
+  loginUrl.pathname = "/login";
   loginUrl.searchParams.set("next", pathname);
 
   return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/panel/:path*", "/create/:path*", "/image-generator/:path*", "/voice-generator/:path*"],
+  matcher: ["/panel/:path*", "/influencers/:path*", "/api/influencers/:path*", "/api/instagram/:path*"],
 };

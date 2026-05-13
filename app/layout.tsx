@@ -1,47 +1,32 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Wiro AI Avatar Video",
-  description: "Mock API ile kredi harcamadan AI avatar video oluşturma arayüzü.",
+  title: "figyfun Influencer CRM",
+  description: "figyfun marka işbirlikleri için güvenli influencer data paneli.",
 };
 
-const navItems = [
-  { href: "/", label: "Ana Sayfa" },
-  { href: "/create", label: "Video Oluştur" },
-  { href: "/image-generator", label: "Görsel Üret" },
-  { href: "/voice-generator", label: "Seslendir" },
-  { href: "/login", label: "Giriş" },
-  { href: "/register", label: "Kayıt Ol" },
-];
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="tr">
       <body>
-        <header className="sticky top-0 z-30 border-b border-white/70 bg-white/85 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-            <Link href="/" className="flex items-center gap-3 font-bold text-ink">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-ink text-white">
-                W
+        <header className="sticky top-0 z-40 border-b border-white/50 bg-[#fbf6e9]/85 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+            <Link href="/panel" className="group flex items-center gap-3 text-fig-ink">
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-fig-ink font-display text-xl font-black text-fig-cream shadow-card transition group-hover:-rotate-3">
+                f
               </span>
-              <span>Wiro Avatar Studio</span>
+              <span>
+                <span className="block font-display text-2xl font-black leading-none">figyfun</span>
+                <span className="block text-[10px] font-black uppercase tracking-[0.28em] text-fig-moss">Influencer CRM</span>
+              </span>
             </Link>
-            <nav className="hidden items-center gap-1 rounded-lg border border-slate-200 bg-white p-1 text-sm font-medium text-slate-600 shadow-sm sm:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-md px-3 py-2 transition hover:bg-slate-100 hover:text-ink"
-                >
-                  {item.label}
-                </Link>
-              ))}
+            <nav className="hidden items-center gap-2 sm:flex">
+              <Link href="/panel" className="btn-soft px-4 py-2">Panel</Link>
+              <Link href="/influencers" className="btn-soft px-4 py-2">Influencerlar</Link>
+              <Link href="/ugc" className="btn-soft px-4 py-2">UGC Formu</Link>
+              <Link href="/login" className="btn-primary px-4 py-2">Giriş</Link>
             </nav>
           </div>
         </header>
